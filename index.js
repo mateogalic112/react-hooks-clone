@@ -19,12 +19,29 @@ const React = (function () {
     return C;
   }
 
-  return { useState, render };
+  function useEffect(cb, depsArray) {
+    const oldDeps = hooks[idx];
+    let hasChanged = true;
+    // detect change
+    if (oldDeps) {
+      hasChanged = depsArray.some((dep, i) => Object.is(dep, oldDeps[i]));
+    }
+
+    if (hasChanged) cb();
+    hooks[idx] = depsArray;
+    idx++;
+  }
+
+  return { useState, render, useEffect };
 })();
 
 function Component() {
   const [count, setCount] = React.useState(0);
   const [text, setText] = React.useState("apple");
+
+  React.useEffect(() => {
+    console.log("I have been invoked");
+  }, []);
 
   return {
     render: () => console.log({ count, text }),
