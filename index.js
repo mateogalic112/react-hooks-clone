@@ -1,14 +1,19 @@
 const React = (function () {
-  let _val;
+  let hooks = [];
+  let idx = 0;
   function useState(initialValue) {
-    const state = _val || initialValue;
+    const state = hooks[idx] || initialValue;
+    const _idx = idx;
     const setState = (newVal) => {
-      _val = newVal;
+      hooks[_idx] = newVal;
     };
+    idx++;
     return [state, setState];
   }
 
   function render(Component) {
+    // Restart index on component rerender
+    idx = 0;
     const C = Component();
     C.render();
     return C;
@@ -19,15 +24,17 @@ const React = (function () {
 
 function Component() {
   const [count, setCount] = React.useState(0);
+  const [text, setText] = React.useState("apple");
 
   return {
-    render: () => console.log(count),
+    render: () => console.log({ count, text }),
     click: () => setCount(count + 1),
+    type: (word) => setText(word),
   };
 }
 
 var App = React.render(Component);
 App.click();
 var App = React.render(Component);
-App.click();
+App.type("pear");
 var App = React.render(Component);
